@@ -11,6 +11,35 @@
         body {
           background-color: #92a8d1;
         }
+        .wrapper { 
+            background:#EFEFEF; 
+            box-shadow: 1px 1px 10px #999; 
+            margin: left; 
+            text-align: left; 
+            position: relative;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            margin-bottom: 20px !important;
+            width: 1500px;
+            padding-top: 5px;
+        }
+        .scrolls { 
+            overflow-x: scroll;
+            overflow-y: hidden;
+            height: 430px;
+        white-space:nowrap
+        } 
+        .imageDiv img { 
+            box-shadow: 1px 1px 10px #999; 
+            margin: 2px;
+            max-height: 50px;
+            cursor: pointer;
+        display:inline-block;
+        *display:inline;
+        *zoom:1;
+        vertical-align:top;
+        }
     </style>
     <script id="fullscreen-vert" type="x-shader/x-vertex">
         varying vec2 vUv;
@@ -74,11 +103,46 @@
                 if( vUv.s < borderX || vUv.s > 1.0 - borderX || vUv.t < borderY || vUv.t > 1.0 - borderY )
                     gl_FragColor.rgb = borderColor;
             }
+            // draw object detection
+            //if (center_dots == 1) {
+            //    float borderX = 0.005;
+            //    float borderY = (resX / resY) * borderX;
+                // check if pixel is in obj detection list
+            //    if( vUv.s < borderX || vUv.s > 1.0 - borderX || vUv.t < borderY || vUv.t > 1.0 - borderY )
+            //        gl_FragColor.rgb = borderColor;
+            //}
             gl_FragColor.a = 1.0;
         }
     </script>
 </head>
 <body>
+    <video id="videoID" width="600" controls>
+        <script type="module">
+            //load video file
+            var video_path = "/2023.03.29-17.39.21-main.mp4"
+            document.querySelector('#videoID').src = video_path;
+        </script>
+        <source type="video/mp4">
+        Your browser does not support HTML video.
+    </video>
+    <br></br>
+    <button type="button">Generate Panorama</button>
+    <br></br>
+    <div class="wrapper">
+        <div class="scrolls">
+            <img src='/frames_updated/0.png' />
+            <img src='/frames_updated/1.png' />
+            <img src='/frames_updated/2.png' />
+            <img src='/frames_updated/3.png' />
+            <img src='/frames_updated/4.png' />
+            <img src='/frames_updated/5.png' />
+            <img src='/frames_updated/6.png' />
+            <img src='/frames_updated/7.png' />
+            <img src='/frames_updated/8.png' />
+            <img src='/frames_updated/9.png' />
+        </div>
+    </div>
+    <br></br>
     <script type="module">
         import * as THREE from 'three';
         import Stats from 'three/addons/libs/stats.module.js';
@@ -103,6 +167,7 @@
         // load json file
         var jsonData = await fetch("/corners_updated.json");
         var jsonCoords = await jsonData.json();
+        
         // load images as textures
         var tex = [];
         var coordsX = [];
@@ -124,6 +189,7 @@
             tex[key] = new THREE.TextureLoader().load( '/frames_updated/' + key.toString() + '.png' );
         });
         var imageCount = tex.length;
+        
         // get min/max x/y values
         var minX = Math.min(...coordsX.map(item => Math.min.apply(null, item)));
         var maxX = Math.max(...coordsX.map(item => Math.max.apply(null, item)));
@@ -174,6 +240,16 @@
             gui.add( params, 'alpha').name("Alpha").min(0.0).max(1.0).step(.01);
             gui.add( params, 'saveImg').name("Save Image");
             gui.open();
+            
+            //a = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+            //a_sub = [[10, 11], [12, 13]]
+            //a_sub_sz = [2, 2]
+            //testAnchorY = 1
+            //testAnchorX = 1
+            //a[testAnchorY:testAnchorY+a_sub_sz[0], testAnchorX:testAnchorX+a_sub_sz[1]] = a_sub
+
+
+            //console.log(a)
         }
 
         function setupRenderTargets() {
@@ -298,6 +374,254 @@
             stats.update();
 
         }
+        /*
+        function video_to_frames(video_path){
+            var cap = cv2.VideoCapture(video_path)
+            var frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            var output_arr = []
+            var success, img = cap.read()
+            while (frame_count >= 0){
+                frame_count = frame_count - 1
+                output_arr.append(img)
+                success, img = cap.read()
+            }
+            return output_arr
+        }
+
+        function get_keypoints_descriptors(image){
+            gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            sift = cv2.xfeatures2d.SIFT_create()
+            kp, des = sift.detectAndCompute(gray_image, None)
+            
+            return(kp, des)
+        }
+
+        function feature_matching(des, des2){
+            FLANN_INDEX_KDTREE = 1
+            index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+            search_params = dict(checks = 50)
+            flann = cv2.FlannBasedMatcher(index_params, search_params)
+            matches = flann.knnMatch(des,des2,k=2)
+            good = []
+            for (m,n in matches){
+                if (m.distance < 0.7*n.distance){
+                    good.append(m)
+                }
+            }
+            return good
+        }
+
+        function get_homography_matrix(image, image2, kp, kp2, good, MIN_MATCH_COUNT){
+            if (good.length > MIN_MATCH_COUNT){
+                src_pts = np.float32([ kp[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
+                dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
+                M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+                if (M is None){
+                    M = None
+                }
+                else{
+                    matchesMask = mask.ravel().tolist()
+                    h = image.shape[0]
+                    w = image.shape[1]
+                    pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
+                    dst = cv2.perspectiveTransform(pts,M)
+                }
+            }
+            else{
+                print( "Not enough matches are found - {}/{}".format(good.length, MIN_MATCH_COUNT) )
+                matchesMask = None
+                M = []
+            }
+            return M
+        }
+
+        //need to take the python stuff out of this
+        function rgb_to_rgba(im){
+            im = Image.fromarray((im).astype(np.uint8))
+            im = im.convert('RGBA')
+            im = np.asarray(im)
+            return im
+        }
+
+        //I've been using background_width = 2280 and background_height = 1284 (3 times the width and height of one frame) as the default
+        function frames_and_corners(indices, main_frame_arr, background_width, background_height){
+            final_pano_frames = []
+            output_min_x = 0
+            output_max_x = 0
+            output_min_y = 0
+            output_max_y = 0
+
+            for (let f = 1; f < indices.length; f++){
+            
+                if (final_pano_frames.length == 0){ 
+                src = rgb_to_rgba(main_frame_arr[indices[1]])
+                dst = rgb_to_rgba(main_frame_arr[indices[0]])
+
+                dst_sz = [dst.length, dst[0].length, dst[0][0].length]
+                pad_sz = [dst_sz[0] * 3, dst_sz[1] * 3, 4]
+                anchorX = dst_sz[1]-1 
+                anchorY = dst_sz[0]-1
+
+                output_min_x = anchorX
+                output_max_x = anchorX + dst_sz[1]-1
+                output_min_y = anchorY
+                output_max_y = anchorY + dst_sz[0]-1
+
+                dst_pad = np.zeros(pad_sz, dtype=np.uint8)
+                dst_pad[anchorY:anchorY+dst_sz[0], anchorX:anchorX+dst_sz[1]] = dst
+
+                //warp src into correct place
+                kp_src, des_src = get_keypoints_descriptors(src)
+                kp_dst, des_dst = get_keypoints_descriptors(dst)
+                matches = feature_matching(des_src, des_dst)
+                transf = get_homography_matrix(src, dst, kp_src, kp_dst, matches, 4)
+
+                src_h, src_w = src.shape[:2]
+                lin_homg_pts = np.array([[0, src_w, src_w, 0], [0, 0, src_h, src_h], [1, 1, 1, 1]])
+
+                trans_lin_homg_pts = transf.dot(lin_homg_pts)
+                trans_lin_homg_pts /= trans_lin_homg_pts[2,:]
+
+                // add translation to the transformation matrix to shift to positive values
+                transl_transf = np.eye(3,3)
+                transl_transf[0,2] += anchorX
+                transl_transf[1,2] += anchorY
+                new_transf = transl_transf.dot(transf)
+                new_transf /= new_transf[2,2]
+
+                //take the corners of src and dst as polygons in shapely
+                pts = np.float32([ [0,0],[src_w, 0],[src_w, src_h],[0, src_h] ]).reshape(-1,1,2)
+                dst_pts = cv2.perspectiveTransform(pts,new_transf)
+
+                src_polygon = Polygon([(dst_pts[0][0][0], dst_pts[0][0][1]), (dst_pts[1][0][0], dst_pts[1][0][1]), (dst_pts[2][0][0], dst_pts[2][0][1]), (dst_pts[3][0][0], dst_pts[3][0][1])])
+                src_polygon_x,src_polygon_y = src_polygon.exterior.xy
+                df['frame_id'][0] = indices[0]
+                df['corner_1_x'][0] = 0
+                df['corner_1_y'][0] = 0
+                df['corner_2_x'][0] = src_w
+                df['corner_2_y'][0] = 0
+                df['corner_3_x'][0] = src_w
+                df['corner_3_y'][0] = src_h
+                df['corner_4_x'][0] = 0
+                df['corner_4_y'][0] = src_h
+
+                df['frame_id'][1] = indices[1]
+                df['corner_1_x'][1] = src_polygon_x[0]
+                df['corner_1_y'][1] = src_polygon_y[0]
+                df['corner_2_x'][1] = src_polygon_x[1]
+                df['corner_2_y'][1] = src_polygon_y[1]
+                df['corner_3_x'][1] = src_polygon_x[2]
+                df['corner_3_y'][1] = src_polygon_y[2]
+                df['corner_4_x'][1] = src_polygon_x[3]
+                df['corner_4_y'][1] = src_polygon_y[3]
+
+                dst_polygon = Polygon([(anchorX,anchorY),(anchorX+760,anchorY),(anchorX+760,anchorY+428),(anchorX,anchorY+428)])
+
+                //get overlap
+                overlap = src_polygon.intersection(dst_polygon)
+                overlap_x,overlap_y = overlap.exterior.xy
+                
+                //warp src
+                warped_src = cv2.warpPerspective(src, new_transf, (pad_sz[1],pad_sz[0]), borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0, 0))
+
+                //use overlap_x, overlap_y to create "bounding box" around src polygon, jump to that bounding box and only check points inside of it for blending while compositing
+                //compositing dst_pad and warped_src
+                //keep dst_pad or warped_src values for pixels with only one or the other
+                //if a pixel is inside the overlap polygon, blend dst_pad and warped_src with equal weights
+                dst_pad_copy = dst_pad.copy()
+                min_x = math.floor(min(src_polygon_x))
+                max_x = math.floor(max(src_polygon_x))
+                min_y = math.floor(min(src_polygon_y))
+                max_y = math.floor(max(src_polygon_y))
+
+                output_min_x = min(output_min_x, min_x)
+                output_max_x = max(output_max_x, max_x)
+                output_min_y = min(output_min_y, min_y)
+                output_max_y = max(output_max_y, max_y)
+
+                for i in range(max_y - min_y):
+                    for j in range(max_x - min_x):
+                    current_point = Point(min_x + j, min_y + i)
+                    if overlap.contains(current_point):
+                        dst_pad_copy[min_y + i][min_x + j] = [(dst_pad_copy[min_y + i][min_x + j][0] / 2 + warped_src[min_y + i][min_x + j][0] / 2), (dst_pad_copy[min_y + i][min_x + j][1] / 2 + warped_src[min_y + i][min_x + j][1] / 2), (dst_pad_copy[min_y + i][min_x + j][2] / 2 + warped_src[min_y + i][min_x + j][2] / 2), 255]
+                    elif src_polygon.contains(current_point):
+                        dst_pad_copy[min_y + i][min_x + j] = warped_src[min_y + i][min_x + j]
+                
+                //save frames
+                final_pano_frames.append(dst_pad) //"pano" with only first frame/dst
+                final_pano_frames.append(dst_pad_copy) //pano with first two frames (src and dst)
+
+                cv2.imwrite("/content/frames/" + str(0) + ".png", main_frame_arr[0])
+                cv2.imwrite("/content/frames/" + str(1) + ".png", main_frame_arr[1])
+
+                //cv2.imwrite("/content/final_pano_frames/" + str(0) + ".png", final_pano_frames[0][anchorY:anchorY+dst_sz[0]:1, anchorX:anchorX+dst_sz[1]:1])
+                //cv2.imwrite("/content/final_pano_frames/" + str(1) + ".png", final_pano_frames[1][output_min_y:output_max_y+1:1, output_min_x:output_max_x+1:1])
+                }
+
+                else{
+                prev_dst_pad_copy = dst_pad_copy.copy()
+                src = rgb_to_rgba(main_frame_arr[indices[f]])
+                dst = prev_dst_pad_copy
+
+                //warp src into correct place
+                kp_src, des_src = get_keypoints_descriptors(src)
+                kp_dst, des_dst = get_keypoints_descriptors(dst)
+                matches = feature_matching(des_src, des_dst)
+                transf = get_homography_matrix(src, dst, kp_src, kp_dst, matches, 4)
+
+                //take the corners of src and dst as polygons in shapely
+                src_h, src_w = src.shape[:2]
+                pts = np.float32([ [0,0],[src_w, 0],[src_w, src_h],[0, src_h] ]).reshape(-1,1,2)
+                dst_pts = cv2.perspectiveTransform(pts,transf)
+
+                polygons = [src_polygon, dst_polygon]
+                dst_polygon = unary_union(polygons)
+
+                src_polygon = Polygon([(dst_pts[0][0][0], dst_pts[0][0][1]), (dst_pts[1][0][0], dst_pts[1][0][1]), (dst_pts[2][0][0], dst_pts[2][0][1]), (dst_pts[3][0][0], dst_pts[3][0][1])])
+                src_polygon_x,src_polygon_y = src_polygon.exterior.xy
+                df['frame_id'][f] = indices[f]
+                df['corner_1_x'][f] = src_polygon_x[0]
+                df['corner_1_y'][f] = src_polygon_y[0]
+                df['corner_2_x'][f] = src_polygon_x[1]
+                df['corner_2_y'][f] = src_polygon_y[1]
+                df['corner_3_x'][f] = src_polygon_x[2]
+                df['corner_3_y'][f] = src_polygon_y[2]
+                df['corner_4_x'][f] = src_polygon_x[3]
+                df['corner_4_y'][f] = src_polygon_y[3]
+
+                //get overlap
+                overlap = src_polygon.intersection(dst_polygon)
+                overlap_x,overlap_y = overlap.exterior.xy
+
+                //warp src
+                warped_src = cv2.warpPerspective(src, transf, (prev_dst_pad_copy.shape[1],prev_dst_pad_copy.shape[0]), borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0, 0))
+
+                //compositing
+                min_x = math.floor(min(src_polygon_x))
+                max_x = math.floor(max(src_polygon_x))
+                min_y = math.floor(min(src_polygon_y))
+                max_y = math.floor(max(src_polygon_y))
+
+                output_min_x = min(output_min_x, min_x)
+                output_max_x = max(output_max_x, max_x)
+                output_min_y = min(output_min_y, min_y)
+                output_max_y = max(output_max_y, max_y)
+
+                for i in range(max_y - min_y):
+                    for j in range(max_x - min_x):
+                    current_point = Point(min_x + j, min_y + i)
+                    if overlap.contains(current_point):
+                        prev_dst_pad_copy[min_y + i][min_x + j] = [(prev_dst_pad_copy[min_y + i][min_x + j][0] / 2 + warped_src[min_y + i][min_x + j][0] / 2), (prev_dst_pad_copy[min_y + i][min_x + j][1] / 2 + warped_src[min_y + i][min_x + j][1] / 2), (prev_dst_pad_copy[min_y + i][min_x + j][2] / 2 + warped_src[min_y + i][min_x + j][2] / 2), 255]
+                    elif src_polygon.contains(current_point):
+                        prev_dst_pad_copy[min_y + i][min_x + j] = warped_src[min_y + i][min_x + j]
+                
+                //save
+                final_pano_frames.append(prev_dst_pad_copy)
+                }
+            }
+            return final_pano_frames
+        }
+        */
 
     </script>
 </body>
