@@ -9,25 +9,40 @@
     <meta charset="utf-8">
     <style>
         body {
-          background-color: #92a8d1;
+          background-color: #ffffff;
         }
-        .wrapper { 
-            background:#EFEFEF; 
-            box-shadow: 1px 1px 10px #999; 
-            margin: left; 
-            text-align: left; 
+        .wrapperright { 
+            background:#ffffff; 
+            box-shadow: 1px 1px 10px #fcfcfc; 
+            margin: right; 
+            text-align: right; 
+            float: right;
             position: relative;
             -webkit-border-radius: 5px;
             -moz-border-radius: 5px;
             border-radius: 5px;
             margin-bottom: 20px !important;
             width: 1500px;
-            padding-top: 5px;
+            padding-top: 0px;
+        }
+        .wrapperleft { 
+            background:#EFEFEF; 
+            box-shadow: 1px 1px 10px #999; 
+            margin: left; 
+            text-align: left; 
+            float: left;
+            position: relative;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            margin-bottom: 20px !important;
+            width: 600px;
+            padding-top: 0px;
         }
         .scrolls { 
             overflow-x: scroll;
             overflow-y: hidden;
-            height: 430px;
+            height: 230px;
         white-space:nowrap
         } 
         .imageDiv img { 
@@ -40,6 +55,246 @@
         *zoom:1;
         vertical-align:top;
         }
+        .slidecontainer {
+        width: 100%;
+        }
+
+        .slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 25px;
+        background: #d3d3d3;
+        outline: none;
+        opacity: 0.7;
+        -webkit-transition: .2s;
+        transition: opacity .2s;
+        }
+
+        .slider:hover {
+        opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        background: #04AA6D;
+        cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+        background: #04AA6D;
+        cursor: pointer;
+        }
+
+        [slider] {
+        width: 300px;
+        position: relative;
+        height: 5px;
+        margin: 45px 0 10px 0;
+        }
+
+        [slider] > div {
+        position: absolute;
+        left: 13px;
+        right: 15px;
+        height: 5px;
+        }
+        [slider] > div > [inverse-left] {
+        position: absolute;
+        left: 0;
+        height: 5px;
+        border-radius: 10px;
+        background-color: #CCC;
+        margin: 0 7px;
+        }
+
+        [slider] > div > [inverse-right] {
+        position: absolute;
+        right: 0;
+        height: 5px;
+        border-radius: 10px;
+        background-color: #CCC;
+        margin: 0 7px;
+        }
+
+
+        [slider] > div > [range] {
+        position: absolute;
+        left: 0;
+        height: 5px;
+        border-radius: 14px;
+        background-color: #2179d0;
+        }
+
+        [slider] > div > [thumb] {
+        position: absolute;
+        top: -7px;
+        z-index: 2;
+        height: 20px;
+        width: 20px;
+        text-align: left;
+        margin-left: -11px;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+        background-color: #FFF;
+        border-radius: 50%;
+        outline: none;
+        }
+
+        [slider] > input[type=range] {
+        position: absolute;
+        pointer-events: none;
+        -webkit-appearance: none;
+        z-index: 3;
+        height: 14px;
+        top: -2px;
+        width: 100%;
+        opacity: 0;
+        }
+
+        div[slider] > input[type=range]:focus::-webkit-slider-runnable-track {
+        background: transparent;
+        border: transparent;
+        }
+
+        div[slider] > input[type=range]:focus {
+        outline: none;
+        }
+
+        div[slider] > input[type=range]::-webkit-slider-thumb {
+        pointer-events: all;
+        width: 28px;
+        height: 28px;
+        border-radius: 0px;
+        border: 0 none;
+        background: #0075ff;
+        -webkit-appearance: none;
+        }
+
+        div[slider] > input[type=range]::-ms-fill-lower {
+        background: transparent;
+        border: 0 none;
+        }
+
+        div[slider] > input[type=range]::-ms-fill-upper {
+        background: transparent;
+        border: 0 none;
+        }
+
+        div[slider] > input[type=range]::-ms-tooltip {
+        display: none;
+        }
+
+        [slider] > div > [sign] {
+        opacity: 0;
+        position: absolute;
+        margin-left: -11px;
+        top: -39px;
+        z-index:3;
+        background-color: #0075ff;
+        color: #fff;
+        width: 28px;
+        height: 28px;
+        border-radius: 28px;
+        -webkit-border-radius: 28px;
+        align-items: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        text-align: center;
+        }
+
+        [slider] > div > [sign]:after {
+        position: absolute;
+        content: '';
+        left: 0;
+        border-radius: 16px;
+        top: 19px;
+        border-left: 14px solid transparent;
+        border-right: 14px solid transparent;
+        border-top-width: 16px;
+        border-top-style: solid;
+        border-top-color: #0075ff;
+        }
+
+        [slider] > div > [sign] > span {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 28px;
+        }
+
+        [slider]:hover > div > [sign] {
+        opacity: 1;
+        }
+
+        .dropdown {
+        position: relative;
+        font-size: 14px;
+        color: #333;
+
+        .dropdown-list {
+            padding: 12px;
+            background: #fff;
+            position: absolute;
+            top: 30px;
+            left: 2px;
+            right: 2px;
+            box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .15);
+            transform-origin: 50% 0;
+            transform: scale(1, 0);
+            transition: transform .15s ease-in-out .15s;
+            max-height: 66vh;
+            overflow-y: scroll;
+        }
+        
+        .dropdown-option {
+            display: block;
+            padding: 8px 12px;
+            opacity: 0;
+            transition: opacity .15s ease-in-out;
+        }
+        
+        .dropdown-label {
+            display: block;
+            height: 30px;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            line-height: 1;
+            cursor: pointer;
+            
+            &:before {
+            content: '▼';
+            float: right;
+            }
+        }
+        
+        &.on {
+        .dropdown-list {
+            transform: scale(1, 1);
+            transition-delay: 0s;
+            
+            .dropdown-option {
+                opacity: 1;
+                transition-delay: .2s;
+            }
+            }
+            
+            .dropdown-label:before {
+            content: '▲';
+            }
+        }
+        
+        [type="checkbox"] {
+            position: relative;
+            top: -1px;
+            margin-right: 4px;
+        }
+        }
+
     </style>
     <script id="fullscreen-vert" type="x-shader/x-vertex">
         varying vec2 vUv;
@@ -75,7 +330,9 @@
         uniform float resY;
         uniform float alpha;
         uniform int highlight;
+        uniform int objDetect;
         uniform vec3 borderColor;
+        uniform vec3 objectColor;
 
         void main() {
             // get color of current image
@@ -99,23 +356,26 @@
             if (highlight == 1) {
                 float borderX = 0.005;
                 float borderY = (resX / resY) * borderX;
+                float testX = 0.1;
                 // check if pixel is on the border
                 if( vUv.s < borderX || vUv.s > 1.0 - borderX || vUv.t < borderY || vUv.t > 1.0 - borderY )
                     gl_FragColor.rgb = borderColor;
+                //if( vUv.s < testX )
+                    //gl_FragColor.rgb = objectColor;
             }
             // draw object detection
-            //if (center_dots == 1) {
-            //    float borderX = 0.005;
-            //    float borderY = (resX / resY) * borderX;
-                // check if pixel is in obj detection list
-            //    if( vUv.s < borderX || vUv.s > 1.0 - borderX || vUv.t < borderY || vUv.t > 1.0 - borderY )
-            //        gl_FragColor.rgb = borderColor;
-            //}
+            if (objDetect == 1) {
+                float testX = 0.1;
+                float testY = 0.1;
+                if( testX - 0.01 < vUv.s && testX + 0.01 > vUv.s && testY - 0.01 < vUv.t && testY + 0.01 > vUv.t)
+                    gl_FragColor.rgb = objectColor;
+            }
             gl_FragColor.a = 1.0;
         }
     </script>
 </head>
 <body>
+    <div class="wrapperleft">
     <video id="videoID" width="600" controls>
         <script type="module">
             //load video file
@@ -125,25 +385,197 @@
         <source type="video/mp4">
         Your browser does not support HTML video.
     </video>
+    <div slider id="slider-distance">
+        <div>
+          <div inverse-left style="width:70%;"></div>
+          <div inverse-right style="width:70%;"></div>
+          <div range style="left:0%;right:0%;"></div>
+          <span thumb style="left:0%;"></span>
+          <span thumb style="left:100%;"></span>
+          <div sign style="left:0%;">
+            <span id="value">0</span>
+          </div>
+          <div sign style="left:100%;">
+            <span id="value">100</span>
+          </div>
+        </div>
+        <input type="range" value="0" max="100" min="0" step="1" oninput="
+        this.value=Math.min(this.value,this.parentNode.childNodes[5].value-1);
+        let value = (this.value/parseInt(this.max))*100
+        var children = this.parentNode.childNodes[1].childNodes;
+        children[1].style.width=value+'%';
+        children[5].style.left=value+'%';
+        children[7].style.left=value+'%';children[11].style.left=value+'%';
+        children[11].childNodes[1].innerHTML=this.value;" />
+      
+        <input type="range" value="100" max="100" min="0" step="1" oninput="
+        this.value=Math.max(this.value,this.parentNode.childNodes[3].value-(-1));
+        let value = (this.value/parseInt(this.max))*100
+        var children = this.parentNode.childNodes[1].childNodes;
+        children[3].style.width=(100-value)+'%';
+        children[5].style.right=(100-value)+'%';
+        children[9].style.left=value+'%';children[13].style.left=value+'%';
+        children[13].childNodes[1].innerHTML=this.value;" />
+    </div>
+    Start Time - End Time
     <br></br>
-    <button type="button">Generate Panorama</button>
+    <label for="Name">Start Frame:</label>
+    <input type="text" id="startFrame" name="startFrame">
+    <label for="Name">End Frame:</label>
+    <input type="text" id="endFrame" name="endFrame">
     <br></br>
-    <div class="wrapper">
+    <h3>Panorama Tuning</h3>
+    <label for="Name">Show every</label>
+    <input type="text" id="dropout" name="dropout" placeholder="5">
+    frames
+    <br></br>
+    <div class="slidecontainer">
+        Alpha value:
+        <input type="range" min="0" max="1" step="0.1" value="0.5" id="myRange"><span id="demo"></span>
+    </div>
+    <script>
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("demo");
+        output.innerHTML = slider.value;
+        
+        slider.oninput = function() {
+          output.innerHTML = this.value;
+        }
+    </script>
+    <br></br>
+    <div class="slidecontainer">
+        Highlight frame:
+        <input type="range" min="0" max="10" step="1" value="5" id="myRangeframe"><span id="demoframe"></span> 
+        <label class="dropdown-option">
+            <input type="checkbox" name="dropdown-group" value="None" />
+            None
+        </label>
+    </div>
+    <script>
+        var sliderframe = document.getElementById("myRangeframe");
+        var outputframe = document.getElementById("demoframe");
+        outputframe.innerHTML = sliderframe.value;
+        
+        sliderframe.oninput = function() {
+            outputframe.innerHTML = this.value;
+        }
+    </script>
+    <br></br>
+    <h3>Highlighting Objects</h3>
+    <div class="slidecontainer">
+        Confidence threshold:
+        <input type="range" min="0" max="1" step="0.05" value="0.5" id="myRangeconf"><span id="democonf"></span>
+    </div>
+    <br></br>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="Jar of nut butter" />
+        Jar of nut butter
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="Jar of jelly / jam" />
+        Jar of jelly / jam
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="plate" />
+        plate
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="paper towel" />
+        paper towel
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="cutting board" />
+        cutting board
+    </label>
+    <br></br>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="butter knife" />
+        butter knife
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="person" />
+        person
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="flour tortilla" />
+        flour tortilla
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="~12-inch strand of dental floss toothpicks" />
+        ~12-inch strand of dental floss toothpicks
+    </label>
+    <br></br>
+    <h3>Highlighting Anomalies</h3>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="Instances of duplicates" />
+        Instances of duplicates 
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="Instances of duplicates" />
+        Disappear and return
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="Instances of duplicates" />
+        Overlapping objects 
+    </label>
+    <br></br>
+    <h3>Expected Object Trajectory</h3>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="Jar of nut butter EOL" />
+        Jar of nut butter
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="Jar of jelly / jam EOL" />
+        Jar of jelly / jam
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="plate EOL" />
+        plate
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="paper towel EOL" />
+        paper towel
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="cutting board EOL" />
+        cutting board
+    </label>
+    <br></br>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="butter knife EOL" />
+        butter knife
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="person EOL" />
+        person
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="flour tortilla EOL" />
+        flour tortilla
+    </label>
+    <label class="dropdown-option">
+        <input type="checkbox" name="dropdown-group" value="~12-inch strand of dental floss toothpicks EOL" />
+        ~12-inch strand of dental floss toothpicks
+    </label>
+    <br></br>
+    <br></br>
+    </div>
+    <div class="wrapperright">
         <div class="scrolls">
-            <img src='/frames_updated/0.png' />
-            <img src='/frames_updated/1.png' />
-            <img src='/frames_updated/2.png' />
-            <img src='/frames_updated/3.png' />
-            <img src='/frames_updated/4.png' />
-            <img src='/frames_updated/5.png' />
-            <img src='/frames_updated/6.png' />
-            <img src='/frames_updated/7.png' />
-            <img src='/frames_updated/8.png' />
-            <img src='/frames_updated/9.png' />
+            <img src='/frames_updated/0.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/1.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/2.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/3.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/4.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/5.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/6.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/7.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/8.png' style="width:380px;height:214px;" />
+            <img src='/frames_updated/9.png' style="width:380px;height:214px;" />
         </div>
     </div>
     <br></br>
-    <script type="module">
+    <script type="module" id="stitch">
         import * as THREE from 'three';
         import Stats from 'three/addons/libs/stats.module.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -152,7 +584,9 @@
         // GUI parameters
         const params = {
             frameID: 0,
+            objDetect: 0,
             color: 0xff0000,
+            objColor: 0x00FF00,
             alpha: 0.5,
             saveImg: function() {
                 var url = renderer.domElement.toDataURL("image/png");
@@ -173,6 +607,11 @@
         var coordsX = [];
         var coordsY = [];
         var frameID = {};
+        var startFrameIdx = document.getElementById("startFrame").value;
+        var endFrameIdx = document.getElementById("endFrame").value;
+        console.log(startFrameIdx)
+        console.log(endFrameIdx)
+
         Object.entries(jsonCoords).forEach((entry) => {
             const [key, value] = entry;
             coordsX[key] = [ 
@@ -236,7 +675,9 @@
             // set up GUI
             const gui = new GUI( { width: 300 } );
             gui.add( params, 'frameID').name("Highlight Frame").min(0).max(imageCount).step(1);
+            gui.add( params, 'objDetect').name("Object Detection").min(0).max(1).step(1);
             gui.addColor(params, 'color').name('Border Color');
+            gui.addColor(params, 'objColor').name('Object Color');
             gui.add( params, 'alpha').name("Alpha").min(0.0).max(1.0).step(.01);
             gui.add( params, 'saveImg').name("Save Image");
             gui.open();
@@ -325,7 +766,9 @@
                         resY: { value: maxY - minY },
                         alpha: { value: params.alpha },
                         highlight: { value: 0 },
+                        objDetect: { value: 0 },
                         borderColor: { value: new THREE.Color(params.color)},
+                        objectColor: { value: new THREE.Color(params.objColor)},
                     }
                 } );
                 material[i].side = THREE.DoubleSide;
@@ -360,7 +803,9 @@
                 material[i].uniforms.bgTex.value = target[lastTarget].texture;
                 material[i].uniforms.alpha.value = params.alpha;
                 material[i].uniforms.highlight.value = (i == params.frameID - 1)? 1 : 0;
+                material[i].uniforms.objDetect.value = params.objDetect;
                 material[i].uniforms.borderColor.value = new THREE.Color(params.color);
+                material[i].uniforms.objectColor.value = new THREE.Color(params.objColor);
                 renderer.render( scene[i], camera );
             }
 
@@ -374,6 +819,7 @@
             stats.update();
 
         }
+        
         /*
         function video_to_frames(video_path){
             var cap = cv2.VideoCapture(video_path)
