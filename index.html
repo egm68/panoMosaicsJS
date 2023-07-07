@@ -421,15 +421,15 @@
     <br></br>
     <h3>Panorama Tuning</h3>
     <label for="Name">Show every</label>
-    <input type="text" id="dropout" name="dropout" placeholder="5">
+    <input type="text" id="dropout" name="dropout" value="1" placeholder="5">
     frames
     <br></br>
     <div class="slidecontainer">
         Alpha value:
-        <input type="range" min="0" max="1" step="0.1" value="0.5" id="myRange"><span id="demo"></span>
+        <input type="range" min="0" max="1" step="0.1" value="0.5" id="alpha"><span id="demo"></span>
     </div>
     <script>
-        var slider = document.getElementById("myRange");
+        var slider = document.getElementById("alpha");
         var output = document.getElementById("demo");
         output.innerHTML = slider.value;
         
@@ -440,14 +440,10 @@
     <br></br>
     <div class="slidecontainer">
         Highlight frame:
-        <input type="range" min="0" max="10" step="1" value="5" id="myRangeframe"><span id="demoframe"></span> 
-        <label class="dropdown-option">
-            <input type="checkbox" name="dropdown-group" value="None" />
-            None
-        </label>
+        <input type="range" min="0" max="10" step="1" value="0" id="highlightFrame"><span id="demoframe"></span> 
     </div>
     <script>
-        var sliderframe = document.getElementById("myRangeframe");
+        var sliderframe = document.getElementById("highlightFrame");
         var outputframe = document.getElementById("demoframe");
         outputframe.innerHTML = sliderframe.value;
         
@@ -785,29 +781,37 @@
 
             var startFrameIdx = document.getElementById("startFrame").value;
             var endFrameIdx = document.getElementById("endFrame").value;
-            console.log(startFrameIdx)
-            console.log(endFrameIdx)
+            var dropout = document.getElementById("dropout").value;
+            var alpha = document.getElementById("alpha").value;
+            var highlightFrame = document.getElementById("highlightFrame").value;
+            //console.log(startFrameIdx)
+            //console.log(endFrameIdx)
+            //console.log(dropout)
+            //console.log(alpha)
+            //console.log(highlightFrame)
 
             // render scene into target
             var currentTarget, lastTarget;
-            var rangeLen = endFrameIdx - startFrameIdx + 1
-            for (var i = 0; i < rangeLen; i++) {
-                lastTarget = (i+1)%2;
-                currentTarget = i%2;
-                // set the current render target and clear it
-                renderer.setRenderTarget( target[currentTarget] );
-                renderer.clear();
-                // render the previous results (full-screen quad)
-                fsMaterial.uniforms.tex.value = target[lastTarget].texture;
-                renderer.render( fsScene, fsCamera );
-                // render the next image on top
-                material[i].uniforms.bgTex.value = target[lastTarget].texture;
-                material[i].uniforms.alpha.value = params.alpha;
-                material[i].uniforms.highlight.value = (i == params.frameID - 1)? 1 : 0;
-                material[i].uniforms.objDetect.value = params.objDetect;
-                material[i].uniforms.borderColor.value = new THREE.Color(params.color);
-                material[i].uniforms.objectColor.value = new THREE.Color(params.objColor);
-                renderer.render( scene[i], camera );
+            for (var i = startFrameIdx-1; i < endFrameIdx; i++) {
+                if (i % dropout === 0){
+                    console.log(i)
+                    lastTarget = (i+1)%2;
+                    currentTarget = i%2;
+                    // set the current render target and clear it
+                    renderer.setRenderTarget( target[currentTarget] );
+                    renderer.clear();
+                    // render the previous results (full-screen quad)
+                    fsMaterial.uniforms.tex.value = target[lastTarget].texture;
+                    renderer.render( fsScene, fsCamera );
+                    // render the next image on top
+                    material[i].uniforms.bgTex.value = target[lastTarget].texture;
+                    material[i].uniforms.alpha.value = alpha;
+                    material[i].uniforms.highlight.value = (i == highlightFrame - 1)? 1 : 0;
+                    material[i].uniforms.objDetect.value = params.objDetect;
+                    material[i].uniforms.borderColor.value = new THREE.Color(params.color);
+                    material[i].uniforms.objectColor.value = new THREE.Color(params.objColor);
+                    renderer.render( scene[i], camera );
+                }
             }
 
             // render the final result (all images) to the framebuffer
