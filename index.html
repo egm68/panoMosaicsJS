@@ -396,10 +396,10 @@
             <span id="value">1</span>
           </div>
           <div sign style="left:100%;">
-            <span id="value">10</span>
+            <span id="value">100</span>
           </div>
         </div>
-        <input type="range" value="1" max="10" min="1" step="1" oninput="
+        <input type="range" value="1" max="100" min="1" step="1" oninput="
         this.value=Math.min(this.value,this.parentNode.childNodes[5].value-1);
         let value = (this.value/parseInt(this.max))*100
         var children = this.parentNode.childNodes[1].childNodes;
@@ -408,7 +408,7 @@
         children[7].style.left=value+'%';children[11].style.left=value+'%';
         children[11].childNodes[1].innerHTML=this.value;" id="startFrame" name="startFrame"/>
       
-        <input type="range" value="10" max="10" min="1" step="1" oninput="
+        <input type="range" value="100" max="100" min="1" step="1" oninput="
         this.value=Math.max(this.value,this.parentNode.childNodes[3].value-(-1));
         let value = (this.value/parseInt(this.max))*100
         var children = this.parentNode.childNodes[1].childNodes;
@@ -440,7 +440,7 @@
     <br></br>
     <div class="slidecontainer">
         Highlight frame:
-        <input type="range" min="0" max="10" step="1" value="0" id="highlightFrame"><span id="demoframe"></span> 
+        <input type="range" min="0" max="100" step="1" value="0" id="highlightFrame"><span id="demoframe"></span> 
     </div>
     <script>
         var sliderframe = document.getElementById("highlightFrame");
@@ -553,16 +553,16 @@
     </div>
     <div class="wrapperright">
         <div class="scrolls">
-            <img src='/frames_updated/0.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/1.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/2.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/3.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/4.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/5.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/6.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/7.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/8.png' style="width:380px;height:214px;" />
-            <img src='/frames_updated/9.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/50.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/51.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/52.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/53.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/54.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/55.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/56.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/57.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/58.png' style="width:380px;height:214px;" />
+            <img src='/frames_hundred/59.png' style="width:380px;height:214px;" />
         </div>
     </div>
     <br></br>
@@ -589,9 +589,14 @@
             },
         };
 
-        // load json file
-        var jsonData = await fetch("/corners_updated.json");
+        // load json files
+        var jsonData = await fetch("/corners_hundred.json");
         var jsonCoords = await jsonData.json();
+
+        var jsonDataDETIC = await fetch("/2023.03.29-17.39.21-detic-image.json");
+        var jsonDETIC = await jsonDataDETIC.json();
+
+        console.log(jsonDETIC);
         
         // load images as textures
         var tex = [];
@@ -600,8 +605,6 @@
         var frameID = {};
         var startFrameIdx = document.getElementById("startFrame").value;
         var endFrameIdx = document.getElementById("endFrame").value;
-        console.log(startFrameIdx)
-        console.log(endFrameIdx)
 
         Object.entries(jsonCoords).forEach((entry) => {
             const [key, value] = entry;
@@ -616,7 +619,7 @@
                 value.corner_3_y,
                 value.corner_4_y ];
             frameID[key] = value.frame_id;
-            tex[key] = new THREE.TextureLoader().load( '/frames_updated/' + key.toString() + '.png' );
+            tex[key] = new THREE.TextureLoader().load( '/frames_hundred/' + (parseInt(key) + 50).toString() + '.png' );
         });
         var imageCount = tex.length;
         
@@ -784,17 +787,12 @@
             var dropout = document.getElementById("dropout").value;
             var alpha = document.getElementById("alpha").value;
             var highlightFrame = document.getElementById("highlightFrame").value;
-            //console.log(startFrameIdx)
-            //console.log(endFrameIdx)
-            //console.log(dropout)
-            //console.log(alpha)
-            //console.log(highlightFrame)
 
             // render scene into target
             var currentTarget, lastTarget;
             for (var i = startFrameIdx-1; i < endFrameIdx; i++) {
                 if (i % dropout === 0){
-                    console.log(i)
+                    //console.log(i)
                     lastTarget = (i+1)%2;
                     currentTarget = i%2;
                     // set the current render target and clear it
